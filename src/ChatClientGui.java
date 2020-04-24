@@ -30,6 +30,8 @@ public class ChatClientGui extends javax.swing.JFrame {
          */
         jTextArea1.setText("Awaiting connection...");
         jLabel1.setText("Enter IP address of server:");
+        this.getRootPane().setDefaultButton(jButton1);
+        
     }
 
     //This is all auto generated code by the design feature
