@@ -10,6 +10,7 @@ public class ChatClientGui extends javax.swing.JFrame {
     String userName;
     Socket socket;
     PrintWriter writer;
+    Logger log;
     
     /**
      * Constructor: initComponents method is called which initialized all
@@ -21,8 +22,7 @@ public class ChatClientGui extends javax.swing.JFrame {
         initComponents();        
         ipAddress = null;
         port = -1;
-        userName = null;
-        
+        userName = null;        
         /**
          * The main text area will display awaiting connection until a 
          * connection has been established.  The label at the bottom will give
@@ -31,7 +31,9 @@ public class ChatClientGui extends javax.swing.JFrame {
         jTextArea1.setText("Awaiting connection...");
         jLabel1.setText("Enter IP address of server:");
         this.getRootPane().setDefaultButton(jButton1);
-        
+        log = new Logger("log.txt");
+        log.log("====NEW SESSION====");
+        log.log("");
     }
 
     //This is all auto generated code by the design feature
@@ -87,12 +89,11 @@ public class ChatClientGui extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 775, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 288, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -136,9 +137,12 @@ public class ChatClientGui extends javax.swing.JFrame {
                 ipAddress = jTextField1.getText();
                 jLabel1.setText("Enter port of server:");
                 jTextField1.setText("");
+                log.log("IP of '" + ipAddress + "' was entered.");
             }catch(Exception e){
+                log.log(ipAddress + " entered.");
                 jLabel1.setText("Invalid IP Address - Enter IP address of server: ");
-                jTextField1.setText("");
+                log.log("Invalid IP Address");
+                jTextField1.setText("");                
                 ipAddress = null;
             }
         }
@@ -153,6 +157,7 @@ public class ChatClientGui extends javax.swing.JFrame {
                 port = Integer.parseInt(jTextField1.getText());
                 client = new ChatClient(ipAddress, port, jTextArea1);                
                 String status = client.execute();
+                log.log("Port of '" + port + "' was entered.");
                 /**
                  * Tell the user if the connection was established, if not we
                  * can start the process over.
@@ -162,13 +167,16 @@ public class ChatClientGui extends javax.swing.JFrame {
                     jLabel1.setText("Connected... Enter a user name:");
                     socket = client.getServerSocket();
                     jTextField1.setText("");
+                    log.log("Connected to " + ipAddress + ": " + port);
                 }else{
                     ipAddress = null;
                     port = -1;
-                    jLabel1.setText(status + "\nEnter IP address of server:");
+                    jLabel1.setText(status + "   Enter IP address of server:");
+                    log.log(status);
                 }
             }catch(Exception e){
-                jTextArea1.setText("Invalid Port.\nEnter port of server...");
+                jTextArea1.setText("Invalid Port. Enter port of server...");
+                log.log("Invalid Port entered");
                 jTextField1.setText("");
                 port = -1; 
             }            
@@ -188,9 +196,11 @@ public class ChatClientGui extends javax.swing.JFrame {
                 OutputStream output = socket.getOutputStream();
                 writer = new PrintWriter(output, true);
                 writer.println(userName);
+                log.log("Set username as " + userName);
             } catch (IOException ex) {
                 jTextArea1.setText(jTextArea1.getText()
                         + "Cannot get output stream: " + ex.getMessage());
+                log.log(ex.getMessage());
                 ex.printStackTrace();
             }
         }
@@ -204,8 +214,12 @@ public class ChatClientGui extends javax.swing.JFrame {
             String text;
             text = jTextField1.getText();
             writer.println(text);
-            if(text.equalsIgnoreCase("bye")) System.exit(0);            
+            if(text.equalsIgnoreCase("bye")){
+                log.close();
+                System.exit(0);
+            }            
             jTextArea1.setText(jTextArea1.getText() + "\n"+userName+": "+text);
+            log.log(userName + ": " + text);
             jTextField1.setText("");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
