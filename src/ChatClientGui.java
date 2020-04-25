@@ -155,7 +155,7 @@ public class ChatClientGui extends javax.swing.JFrame {
             try{
                 //Grab port from text field and create an instance of ChatClient
                 port = Integer.parseInt(jTextField1.getText());
-                client = new ChatClient(ipAddress, port, jTextArea1);                
+                client = new ChatClient(ipAddress, port, jTextArea1, log);                
                 String status = client.execute();
                 log.log("Port of '" + port + "' was entered.");
                 /**

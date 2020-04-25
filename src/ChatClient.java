@@ -12,6 +12,7 @@ public class ChatClient {
     private String userName;
     private JTextArea jTextArea1;
     private Socket socket;
+    private Logger log;
  
     /**
      * Constructor: Takes an IP called hostname, port, and a reference to the 
@@ -19,10 +20,11 @@ public class ChatClient {
      * reference to the read thread.  This way,  the read thread can update the
      * text area when it receives messages from the server.
      */
-    public ChatClient(String hostname, int port, JTextArea jTextArea1) {
+    public ChatClient(String hostname, int port, JTextArea jTextArea1, Logger log) {
         this.hostname = hostname;
         this.port = port;
         this.jTextArea1 = jTextArea1;
+        this.log = log;
     }
     
     /**
@@ -34,7 +36,7 @@ public class ChatClient {
     public String execute() {
         try {
             socket = new Socket(hostname, port);            
-            new ReadThread(socket, this, jTextArea1).start();
+            new ReadThread(socket, this, jTextArea1, log).start();
             return ("Connected to the chat server");
         } catch (UnknownHostException ex) {
             return ("Server not found: " + ex.getMessage());

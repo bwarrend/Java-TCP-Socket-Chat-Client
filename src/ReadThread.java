@@ -11,15 +11,17 @@ public class ReadThread extends Thread {
     private Socket socket;
     private ChatClient client;
     private JTextArea jTextArea1;
+    private Logger log;
     
     /**
      * Constructor: Take a socket, the current ChatClient, and try to create a
      * buffered reader for reading server messages
      */
-    public ReadThread(Socket socket, ChatClient client, JTextArea jTextArea1) {
+    public ReadThread(Socket socket, ChatClient client, JTextArea jTextArea1, Logger log) {
         this.socket = socket;
         this.client = client;
-        this.jTextArea1 = jTextArea1; 
+        this.jTextArea1 = jTextArea1;
+        this.log = log;
         try {
             InputStream input = socket.getInputStream();
             reader = new BufferedReader(new InputStreamReader(input));
@@ -37,14 +39,8 @@ public class ReadThread extends Thread {
         while (true) {
             try {
                 String response = reader.readLine();
-                jTextArea1.setText(jTextArea1.getText() + "\n" + response); 
-                
-                //WHAT IS THE PURPOSE OF THIS???
-                //if (client.getUserName() != null) {
-                //    jTextArea1.setText(jTextArea1.getText() 
-                //            + "" + client.getUserName() + ": ");
-                //}
-                
+                jTextArea1.setText(jTextArea1.getText() + "\n" + response);
+                log.log(response);
                 
             } catch (IOException ex) {
                 jTextArea1.setText(jTextArea1.getText() 
